@@ -27,7 +27,7 @@
 			
 			%>
 		<h4>표현식(Expression)</h4>
-		<p>var 3 : <%= var3 %></p>
-		<p>var 4 : <%= var4 %></p>
+		<p>var3 : <%= var3 %></p>
+		<p>var4 : <%= var4 %></p>
 	</body>
 </html>
