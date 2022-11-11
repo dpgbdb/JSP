@@ -7,15 +7,19 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import kr.co.jboard.bean.ArticleBean;
 import kr.co.jboard.bean.FileBean;
 import kr.co.jboard.config.DBCP;
 import kr.co.jboard.config.Sql;
 
-
 // DAO(Data Access Object) : 데이터베이스 처리 클래스
 public class ArticleDAO {
-
+	
+	Logger logger = LoggerFactory.getLogger(getClass());
+	
 	private static ArticleDAO instance = new ArticleDAO();
 	public static ArticleDAO getInstance() {
 		return instance;
@@ -58,6 +62,7 @@ public class ArticleDAO {
 			
 		}catch(Exception e){
 			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		return parent;
 	}
@@ -76,6 +81,7 @@ public class ArticleDAO {
 			conn.close();			
 		}catch(Exception e){
 			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 	}
 	
@@ -115,6 +121,7 @@ public class ArticleDAO {
 			
 		}catch(Exception e){
 			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		
 		return article;
@@ -138,6 +145,7 @@ public class ArticleDAO {
 			conn.close();
 		}catch (Exception e) {
 			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		return total;
 	}
@@ -179,6 +187,7 @@ public class ArticleDAO {
 			
 		}catch(Exception e){
 			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		
 		return article;
@@ -219,6 +228,7 @@ public class ArticleDAO {
 			
 		}catch(Exception e){
 			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		
 		return articles;
@@ -246,6 +256,7 @@ public class ArticleDAO {
 		 	conn.close();
 		}catch(Exception e){
 			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		return fb;
 	}
@@ -285,12 +296,28 @@ public class ArticleDAO {
 			
 		}catch (Exception e) {
 			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		
 		return comments;
 	}
 	
-	public void updateArticle() {}
+	public void updateArticle(String no, String title, String content) {
+		try {
+			Connection conn = DBCP.getConnection();
+			PreparedStatement psmt = conn.prepareStatement(Sql.UPDATE_ARTICLE);
+			psmt.setString(1, title);
+			psmt.setString(2, content);
+			psmt.setString(3, no);
+			
+			psmt.executeUpdate();
+			psmt.close();
+			conn.close();
+		}catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+	}
 	
 	public void updateArticleHit(String no) {
 		try {
@@ -302,6 +329,7 @@ public class ArticleDAO {
 			conn.close();
 		}catch (Exception e) {
 			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 	}
 	
@@ -315,6 +343,7 @@ public class ArticleDAO {
 			conn.close();
 		}catch (Exception e) {
 			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 	}
 	
@@ -331,12 +360,62 @@ public class ArticleDAO {
 			conn.close();
 		}catch (Exception e) {
 			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		
 		return result;
 	}
 	
-	public void deleteArticle() {}
+	public void deleteArticle(String no) {
+		try {
+			Connection conn = DBCP.getConnection();
+			PreparedStatement psmt = conn.prepareStatement(Sql.DELETE_ARTICLE);
+			psmt.setString(1, no);
+			psmt.setString(2, no);
+			psmt.executeUpdate();
+			psmt.close();
+			conn.close();
+		}catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+		
+	}
+	
+	public String deleteFile(String no) {
+		
+		String newName = null;
+		
+		try {
+			Connection conn = DBCP.getConnection();
+			
+			conn.setAutoCommit(false);
+			PreparedStatement psmt1 = conn.prepareStatement(Sql.SELECT_FILE);
+			PreparedStatement psmt2 = conn.prepareStatement(Sql.DELETE_FILE);
+			
+			psmt1.setString(1, no);
+			psmt2.setString(1, no);
+			
+			ResultSet rs = psmt1.executeQuery();
+			psmt2.executeUpdate();
+			
+			conn.commit();
+			
+			if(rs.next()) {
+				newName = rs.getString(3);
+			}
+			
+			psmt1.close();
+			psmt2.close();
+			conn.close();
+			
+		}catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+		
+		return newName;
+	}
 	
 	public int deleteComment(String no) {
 		int result = 0;
@@ -349,6 +428,7 @@ public class ArticleDAO {
 			conn.close();
 		}catch (Exception e) {
 			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		
 		return result;
@@ -357,5 +437,3 @@ public class ArticleDAO {
 	
 	
 }
-	
-	
