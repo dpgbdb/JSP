@@ -1,23 +1,24 @@
 package kr.co.Jboard2.controller.user;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+
+import com.google.gson.JsonObject;
 
 import kr.co.Jboard2.service.user.UserService;
-import kr.co.Jboard2.vo.UserVO;
 
-@WebServlet("/user/logout.do")
-public class LogoutController extends HttpServlet {
+@WebServlet("/user/checkUid.do")
+public class CheckUidController extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 	private UserService service = UserService.INSTANCE;
+	
 	
 	@Override
 	public void init() throws ServletException {
@@ -25,24 +26,15 @@ public class LogoutController extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		
-		HttpSession sess = req.getSession();
-		UserVO sessUser = (UserVO)sess.getAttribute("sessUser");
-		String uid = sessUser.getUid();
+		String uid = req.getParameter("uid");
+		int result = service.selectCountUid(uid);
 		
-		// 세션 해제
-		sess.removeAttribute("sessUser");
-		sess.invalidate();
-
-		// 쿠키 삭제
-		Cookie cookie = new Cookie("SESSID", null);
-		cookie.setPath("/");
-		cookie.setMaxAge(0);
-		resp.addCookie(cookie);
+		// JSON 출력
+		JsonObject json = new JsonObject();
+		json.addProperty("result", result);
 		
-		// 데이터베이스 사용자 sessId update
-		service.updateUserForSessionOut(uid);
-		
-		resp.sendRedirect("/Jboard2/user/login.do?success=200");
+		PrintWriter writer = resp.getWriter();
+		writer.print(json.toString());
 	}
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

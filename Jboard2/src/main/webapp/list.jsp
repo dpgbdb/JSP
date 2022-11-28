@@ -2,7 +2,7 @@
 <jsp:include page = "./_header.jsp"/>
         <main id="board">
             <section class="list">                
-                <form action="#">
+                <form action="/Jboard2/list.do">
                     <input type="text" name="search" placeholder="제목 키워드, 글쓴이 검색">
                     <input type="submit" value="검색">
                 </form>
@@ -33,7 +33,7 @@
                     <a href="#" class="next">다음</a>
                 </div>
 
-                <a href="./write.html" class="btn btnWrite">글쓰기</a>
+                <a href="./write.do" class="btn btnWrite">글쓰기</a>
                 
             </section>
         </main>
